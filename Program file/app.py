@@ -1,13 +1,19 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import requests
 
 app = Flask(__name__)
 
 API_KEY = "1305a3d5074e398d143807afff9362e6"  # Replace with your actual API key
 
+# Serve the index.html file for the root URL
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# API endpoint to check the phone number
 @app.route('/check-number', methods=['POST'])
 def check_number():
-    data = request.get_json()  # Fix the typo here
+    data = request.get_json()
     number = data.get('number')
 
     # Make a request to the Numverify API

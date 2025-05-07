@@ -3,65 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone Number Validation</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        #results {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
-        }
-        .result-item {
-            margin-bottom: 10px;
-        }
-    </style>
+    <title>Phone Number Checker</title>
 </head>
 <body>
-    <h1>Phone Number Validation</h1>
-    <div>
-        <label for="phone-number">Enter Phone Number: </label>
-        <input type="text" id="phone-number" placeholder="e.g., 12523733215">
-        <button onclick="checkNumber()">Check Number</button>
-    </div>
+    <h1>Check Phone Number Status</h1>
+    <form action="/check-number" method="POST" id="check-form">
+        <input type="text" name="number" id="number" placeholder="Enter phone number" required>
+        <button type="submit">Check</button>
+    </form>
 
-    <div id="results" style="display: none;">
-        <h2>Results:</h2>
-        <div id="valid"></div>
-        <div id="status"></div>
-        <div id="allowed"></div>
-        <div id="line-type"></div>
-        <div id="carrier"></div>
-    </div>
+    <div id="result"></div>
 
     <script>
-        function checkNumber() {
-            const number = document.getElementById('phone-number').value;
+        document.getElementById('check-form').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-            // Make the API call to the backend
-            $.ajax({
-                url: '/check-number',
-                type: 'POST',
-                data: JSON.stringify({ "number": number }),
-                contentType: "application/json",
-                success: function(data) {
-                    // Show the results
-                    document.getElementById('results').style.display = 'block';
-                    document.getElementById('valid').innerHTML = "Valid: " + data.valid;
-                    document.getElementById('status').innerHTML = "Status: " + data.status;
-                    document.getElementById('allowed').innerHTML = "Access: " + data.allowed;
-                    document.getElementById('line-type').innerHTML = "Line Type: " + data.line_type;
-                    document.getElementById('carrier').innerHTML = "Carrier: " + data.carrier;
+            const number = document.getElementById('number').value;
+
+            fetch('/check-number', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                error: function(err) {
-                    alert("Error: " + err.responseText);
-                }
+                body: JSON.stringify({ number: number })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let result = `<p>Status: ${data.status}</p>
+                              <p>Allowed: ${data.allowed}</p>
+                              <p>Line Type: ${data.line_type}</p>
+                              <p>Carrier: ${data.carrier}</p>`;
+                document.getElementById('result').innerHTML = result;
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
             });
-        }
+        });
     </script>
 </body>
 </html>
