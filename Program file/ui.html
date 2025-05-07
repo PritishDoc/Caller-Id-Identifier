@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Number Validation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Phone Number Validation</h1>
+    <div>
+        <label for="phone-number">Enter Phone Number: </label>
+        <input type="text" id="phone-number" placeholder="e.g., 12523733215">
+        <button onclick="checkNumber()">Check Number</button>
+    </div>
+
+    <div id="results" style="display: none;">
+        <h2>Results:</h2>
+        <div id="valid"></div>
+        <div id="status"></div>
+        <div id="allowed"></div>
+        <div id="line-type"></div>
+        <div id="carrier"></div>
+    </div>
+
+    <script>
+        function checkNumber() {
+            const number = document.getElementById('phone-number').value;
+
+            // Make the API call to the backend
+            $.ajax({
+                url: '/check-number',
+                type: 'POST',
+                data: JSON.stringify({ "number": number }),
+                contentType: "application/json",
+                success: function(data) {
+                    // Show the results
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('valid').innerHTML = "Valid: " + data.valid;
+                    document.getElementById('status').innerHTML = "Status: " + data.status;
+                    document.getElementById('allowed').innerHTML = "Access: " + data.allowed;
+                    document.getElementById('line-type').innerHTML = "Line Type: " + data.line_type;
+                    document.getElementById('carrier').innerHTML = "Carrier: " + data.carrier;
+                },
+                error: function(err) {
+                    alert("Error: " + err.responseText);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
