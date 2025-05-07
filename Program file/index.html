@@ -3,22 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone Number Checker</title>
+    <title>Phone Number Validation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        .result h4 {
+            margin: 0;
+        }
+        .result .positive {
+            color: green;
+        }
+        .result .negative {
+            color: red;
+        }
+        .result .allowed {
+            color: green;
+        }
+        .result .not-allowed {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-    <h1>Check Phone Number Status</h1>
-    <form action="/check-number" method="POST" id="check-form">
-        <input type="text" name="number" id="number" placeholder="Enter phone number" required>
-        <button type="submit">Check</button>
-    </form>
 
-    <div id="result"></div>
+    <div class="container">
+        <h2>Check Phone Number</h2>
+        <div class="form-group">
+            <input type="text" id="phoneNumber" placeholder="Enter phone number" />
+        </div>
+        <button class="btn" id="checkBtn">Check</button>
+
+        <div class="result" id="result" style="display:none;">
+            <h4>Validation Result:</h4>
+            <p><strong>Status:</strong> <span id="status"></span></p>
+            <p><strong>Allowed:</strong> <span id="allowed"></span></p>
+            <p><strong>Line Type:</strong> <span id="lineType"></span></p>
+            <p><strong>Carrier:</strong> <span id="carrier"></span></p>
+        </div>
+    </div>
 
     <script>
-        document.getElementById('check-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const number = document.getElementById('number').value;
+        document.getElementById('checkBtn').addEventListener('click', function() {
+            var number = document.getElementById('phoneNumber').value;
 
             fetch('/check-number', {
                 method: 'POST',
@@ -29,16 +102,19 @@
             })
             .then(response => response.json())
             .then(data => {
-                let result = `<p>Status: ${data.status}</p>
-                              <p>Allowed: ${data.allowed}</p>
-                              <p>Line Type: ${data.line_type}</p>
-                              <p>Carrier: ${data.carrier}</p>`;
-                document.getElementById('result').innerHTML = result;
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('status').innerText = data.status;
+                document.getElementById('allowed').innerText = data.allowed;
+                document.getElementById('lineType').innerText = data.line_type;
+                document.getElementById('carrier').innerText = data.carrier;
+
+                // Change colors based on status
+                document.getElementById('status').className = data.status.toLowerCase();
+                document.getElementById('allowed').className = data.allowed.toLowerCase();
             })
-            .catch(error => {
-                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
-            });
+            .catch(error => console.error('Error:', error));
         });
     </script>
+
 </body>
 </html>
