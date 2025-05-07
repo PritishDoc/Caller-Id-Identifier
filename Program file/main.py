@@ -1,13 +1,16 @@
+from flask import Flask, request, jsonify
 import requests
 
-API_KEY = "1305a3d5074e398d143807afff9362e6"  # Free API key from Numverify
-numbers = [
-    "12523733215", "12523733845", "12523734875",
-    "12622639954", "12692639923", "12692853922",
-    "12785934129"
-]
+app = Flask(__name__)
 
-for number in numbers:
+API_KEY = "1305a3d5074e398d143807afff9362e6"  # Replace with your actual API key
+
+@app.route('/check-number', methods=['POST'])
+def check_number():
+    data = request.get_json()
+    number = data.get('number')
+
+    # Make a request to the Numverify API
     response = requests.get(
         "http://apilayer.net/api/validate",
         params={
@@ -17,19 +20,25 @@ for number in numbers:
             "format": 1
         }
     )
-    data = response.json()
-    valid = data.get("valid", False)
-    line_type = data.get("line_type", "Unknown")
-    carrier = data.get("carrier", "Unknown")
+    api_data = response.json()
 
-    # Determine status based on validity
+    # Determine the status
+    valid = api_data.get("valid", False)
     status = "Positive" if valid else "Negative"
     allowed = "Allowed" if valid else "Not Allowed"
+    line_type = api_data.get("line_type", "Unknown")
+    carrier = api_data.get("carrier", "Unknown")
 
-    print(f"Number: {number}")
-    print(f"  Valid: {valid}")
-    print(f"  Status: {status}")
-    print(f"  Access: {allowed}")
-    print(f"  Line Type: {line_type}")
-    print(f"  Carrier: {carrier}")
-    print("-" * 40)
+    # Prepare the response
+    result = {
+        "valid": valid,
+        "status": status,
+        "allowed": allowed,
+        "line_type": line_type,
+        "carrier": carrier
+    }
+    
+    return jsonify(result)
+
+if __name__ == '__main__':
+    app.run(debug=True)
