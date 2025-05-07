@@ -7,7 +7,7 @@ API_KEY = "1305a3d5074e398d143807afff9362e6"  # Replace with your actual API key
 
 @app.route('/check-number', methods=['POST'])
 def check_number():
-    data = request.get_json()
+    data = request.get_json()  # Fix the typo here
     number = data.get('number')
 
     # Make a request to the Numverify API
